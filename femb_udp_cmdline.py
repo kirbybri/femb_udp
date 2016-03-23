@@ -56,8 +56,24 @@ class FEMB_UDP:
         if int(dataHex[0:4],16) != regVal :
                 print "Error read_reg: Invalid response packet"
                 return None
-        dataHexVal = int(dataHex[4:12],16)
+        #dataHexVal = int(dataHex[4:12],16)
 	return dataHexVal
+
+    def get_hs_data(self):
+        #set up listening socket
+        sock_data = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Internet, UDP
+        sock_data.bind(('',self.UDP_PORT_HSDATA))
+
+	#receive data, don't pause if no response
+	sock_data.settimeout(2)
+        data = sock_data.recv(1024)
+
+	#extract 496 data words from binary buffer, first 16 bytes are header
+        #dataNtuple = struct.unpack_from(">496H",data[16:])
+	dataNtuple = struct.unpack_from(">512H",data)
+        sock_data.close()
+        return dataNtuple[16:]
+	#return dataNtuple
 
     #__INIT__#
     def __init__(self):
@@ -68,4 +84,5 @@ class FEMB_UDP:
 	self.UDP_PORT_WREG = 32000
 	self.UDP_PORT_RREG = 32001
 	self.UDP_PORT_RREGRESP = 32002
+	self.UDP_PORT_HSDATA = 32003
 	self.MAX_REG_VAL = 666 

@@ -20,10 +20,10 @@ femb.write_reg( 1, 1)
 femb.write_reg( 1, 2)
 
 #Set ADC test pattern register
-femb.write_reg( 3, 0x012300FF)
+femb.write_reg( 3, 0x01230000)
 
 #Set ADC latch_loc register 1
-femb.write_reg( 4, 0x06060606)
+femb.write_reg( 4, 0x07070707)
 
 #Set test pulse variables
 femb.write_reg( 5, 0x0)
@@ -32,7 +32,7 @@ femb.write_reg( 5, 0x0)
 femb.write_reg( 6, 0x0)
 
 #Set test mode register
-femb.write_reg( 7, 0x0)
+femb.write_reg( 7, 0x00000)
 
 #Set number events per header
 femb.write_reg( 8, 0x0)
@@ -41,7 +41,7 @@ femb.write_reg( 8, 0x0)
 femb.write_reg( 9, 0x1)
 
 #Set ADC latch_loc register 2
-femb.write_reg( 14, 0x06060606)
+femb.write_reg( 14, 0x07070707)
 
 #FE ASIC SPI registers
 print "Config FE ASIC SPI"
