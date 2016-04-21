@@ -56,10 +56,10 @@ class FEMB_UDP:
         if int(dataHex[0:4],16) != regVal :
                 print "Error read_reg: Invalid response packet"
                 return None
-        #dataHexVal = int(dataHex[4:12],16)
+        dataHexVal = int(dataHex[4:12],16)
 	return dataHexVal
 
-    def get_hs_data(self):
+    def get_data(self):
         #set up listening socket
         sock_data = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Internet, UDP
         sock_data.bind(('',self.UDP_PORT_HSDATA))
@@ -75,6 +75,30 @@ class FEMB_UDP:
         return dataNtuple[16:]
 	#return dataNtuple
 
+    def record_binary_data(self, val):
+	numVal = int(val)
+        if (numVal < 0) or (numVal > self.MAX_NUM_PACKETS):
+                print "Error record_hs_data: Invalid number of data packets requested"
+                return None
+
+	#set up listening socket
+        sock_data = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Internet, UDP
+        sock_data.bind(('',self.UDP_PORT_HSDATA))
+        sock_data.settimeout(2)
+
+	#set up output file
+	FILE = open("testfile.dat","wb")	
+
+	#write N data packets to file
+	for packet in range(0,numVal,1):
+		data = sock_data.recv(1024)
+		#dataNtuple = struct.unpack_from(">512H",data)
+		#print dataNtuple[8:]
+		FILE.write(data)
+
+	FILE.close()
+	sock_data.close()
+
     #__INIT__#
     def __init__(self):
 	self.UDP_IP = "192.168.121.1"
@@ -86,3 +110,4 @@ class FEMB_UDP:
 	self.UDP_PORT_RREGRESP = 32002
 	self.UDP_PORT_HSDATA = 32003
 	self.MAX_REG_VAL = 666 
+	self.MAX_NUM_PACKETS = 1000

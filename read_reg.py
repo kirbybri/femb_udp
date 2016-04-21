@@ -14,5 +14,7 @@ if (regVal < 0) or (regVal > 666):
         sys.exit(0)
 
 femb = FEMB_UDP()
+
+#for reg in range(0,64,1):
 val = femb.read_reg(regVal)
-print hex(val)
+print str(regVal) + "\t" + str(hex(val))
