@@ -19,7 +19,9 @@ sock_data = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Internet, UDP
 sock_data.bind(('',femb.UDP_PORT_HSDATA))
 sock_data.settimeout(2)
 
-while 1:
+#while 1:
+for i in range(0,10,1):
+	print "Packet " + str(i) +" out of 10"
 	dataBuf = sock_data.recv(1024)
 	data = struct.unpack_from(">512H",dataBuf)
 	data = data[16:]

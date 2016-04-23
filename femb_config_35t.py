@@ -48,6 +48,10 @@ class FEMB_CONFIG:
 	#Set ADC clock phase
 	self.femb.write_reg( self.REG_CLKPHASE, 0x0)
 
+	#internal test pulser control
+	self.femb.write_reg( 5, 0x02000001)
+	self.femb.write_reg( 13, 0x0) #enable
+
 	#Set test and readout mode register
 	self.femb.write_reg( 7, 0x0000) #11-8 = channel select, 3-0 = ASIC select
 
@@ -127,7 +131,70 @@ class FEMB_CONFIG:
 	for regNum in range(self.REG_FESPI_RDBACK_BASE,self.REG_FESPI_RDBACK_BASE+34,1):
 	        val = self.femb.read_reg( regNum)            
 	        print hex(val)
-	
+
+    def selectChannel(self,asic,chan):
+	asicVal = int(asic)
+	if (asicVal < 0 ) or (asicVal > 7 ) :
+		print "femb_config_femb : selectChan - invalid ASIC number"
+		return
+	chVal = int(chan)
+        if (chVal < 0 ) or (chVal > 15 ) :
+                print "femb_config_femb : selectChan - invalid channel number"
+                return
+
+	#print "Selecting ASIC " + str(asicVal) + ", channel " + str(chVal)
+
+	regVal = (chVal << 8 ) + asicVal
+	self.femb.write_reg( self.REG_SEL_CH, regVal)
+
+    def configFeAsic(self,gain,shape,base):
+	gainVal = int(gain)
+	if (gainVal < 0 ) or (gainVal > 3):
+		return
+	shapeVal = int(shape)
+	if (shapeVal < 0 ) or (shapeVal > 3):
+		return
+	baseVal = int(base)
+	if (baseVal < 0 ) or (baseVal > 1):
+		return
+
+	#get ASIC channel config register SPI values	
+	chReg = 0x0
+	gainArray = [0,2,1,3]
+	shapeArray = [2,0,3,1] #I don't know why
+	chReg = (gainArray[gainVal] << 4 ) + (shapeArray[shapeVal] << 2)
+
+	if (baseVal == 0) :
+		chReg = chReg + 0x40
+
+	#enable test capacitor here
+	chReg = chReg + 0x80 #enabled
+	#chReg = chReg + 0x0 #disabled
+
+	#need better organization of SPI, just store in words for now
+	word1 = chReg + (chReg << 8) + (chReg << 16) + (chReg << 24)
+	word2 = (chReg << 8) + (chReg << 24)
+	word3 = chReg + (chReg << 16)
+
+	print "Config FE ASIC SPI"
+        for regNum in range(self.REG_FESPI_BASE,self.REG_FESPI_BASE+34,1):
+                self.femb.write_reg( regNum, word1)
+        self.femb.write_reg( self.REG_FESPI_BASE+8, word2 )
+        self.femb.write_reg( self.REG_FESPI_BASE+16, word3 )
+        self.femb.write_reg( self.REG_FESPI_BASE+25, word2 )
+        self.femb.write_reg( self.REG_FESPI_BASE+33, word3 )
+
+	#Write FE ASIC SPI
+        print "Program FE ASIC SPI"
+        self.femb.write_reg( self.REG_ASIC_SPIPROG, 2)
+        time.sleep(0.1)
+        self.femb.write_reg( self.REG_ASIC_SPIPROG, 2)
+        time.sleep(0.1)
+
+	print "Check FE ASIC SPI"
+        for regNum in range(self.REG_FESPI_RDBACK_BASE,self.REG_FESPI_RDBACK_BASE+34,1):
+                val = self.femb.read_reg( regNum)
+                #print hex(val)
 
     #__INIT__#
     def __init__(self):
