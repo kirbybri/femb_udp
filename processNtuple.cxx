@@ -37,6 +37,10 @@ class Analyze {
 	unsigned int chan, num;
 	unsigned short wf[512];
 
+	//metadata tree
+	TTree *tr_metadata;
+	TTree *tr_outmetadata;
+
 	//Constants
 	const int numChan = 128;// 35t
 
@@ -73,7 +77,7 @@ Analyze::Analyze(std::string inputFileName){
 	}
 
 	//initialize tr_rawdata branches
-  	tr_rawdata = (TTree*) inputFile->Get("t1");
+  	tr_rawdata = (TTree*) inputFile->Get("femb_wfdata");
   	if( !tr_rawdata ){
 		std::cout << "Error opening input file tree" << std::endl;
 		gSystem->Exit(0);
@@ -81,6 +85,15 @@ Analyze::Analyze(std::string inputFileName){
 	tr_rawdata->SetBranchAddress("chan", &chan);
   	tr_rawdata->SetBranchAddress("num", &num);
   	tr_rawdata->SetBranchAddress("wf", &wf);
+
+	//get metadata
+	tr_metadata = (TTree*) inputFile->Get("metadata");
+  	if( !tr_metadata ){
+		std::cout << "Error opening input file tree" << std::endl;
+		gSystem->Exit(0);
+  	}
+	//copy metadata tree
+	tr_outmetadata = tr_metadata->CloneTree();
 
 	//make output file
   	std::string outputFileName = "output_processNtuple_" + inputFileName;
@@ -92,7 +105,7 @@ Analyze::Analyze(std::string inputFileName){
 	//initialize graphs
 	gCh = new TGraph();
 
-  	//histograms
+  	//output histograms, data objects
   	hSampVsChan = new TH2F("hSampVsChan","",numChan,0-0.5,numChan-0.5,4096,-0.5,4096-0.5);
  	pSampVsChan = new TProfile("pSampVsChan","",numChan,0-0.5,numChan-0.5);
   	hMeanVsChan = new TH2F("hMeanVsChan","",numChan,0-0.5,numChan-0.5,4096,-0.5,4096-0.5);
@@ -115,6 +128,7 @@ void Analyze::doAnalysis(){
   	}//entries
 
     	gOut->Cd("");
+	tr_outmetadata->Write();
   	hSampVsChan->Write();
 	pSampVsChan->Write();
   	hMeanVsChan->Write();
@@ -171,10 +185,10 @@ void Analyze::analyzeChannel(){
 	pRmsVsChan->Fill(chan, rms);
 
 	//draw waveform if wanted
-	if( 1 ){
+	if( 0 ){
 		gCh->Set(0);
 		for( int s = 0 ; s < num ; s++ )
-			gCh->SetPoint(gCh->GetN() , s , wf[s] );
+			gCh->SetPoint(gCh->GetN() , gCh->GetN() , wf[s] );
 		std::cout << "Channel " << chan << std::endl;
 		c0->Clear();
 		std::string title = "Channel " + to_string( chan );
@@ -185,8 +199,8 @@ void Analyze::analyzeChannel(){
 		//gCh->GetYaxis()->SetRangeUser(500,1000);
 		gCh->Draw("ALP");
 		c0->Update();
-		//char ct;
-		//std::cin >> ct;
+		char ct;
+		std::cin >> ct;
 	}
 }
 
