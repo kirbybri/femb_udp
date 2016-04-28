@@ -29,6 +29,7 @@ class Analyze {
 	void doAnalysis();
 	void analyzeChannel();
 
+	//Files
 	TFile* inputFile;
 	TFile *gOut;
 
@@ -44,6 +45,7 @@ class Analyze {
 	//Constants
 	const int numChan = 128;// 35t
 
+	//data objects
 	TCanvas* c0;
 	TGraph *gCh;
 
@@ -147,8 +149,9 @@ void Analyze::analyzeChannel(){
 	double mean = 0;
 	int count = 0;
 	for( int s = 0 ; s < num ; s++ ){
+		if(  wf[s] < 10 ) continue;
+		if( (wf[s] & 0x3F ) == 0x0 || (wf[s] & 0x3F ) == 0x3F ) continue;
 		double value = wf[s];
-		if( value < 10 ) continue;
 		mean += value;
 		count++;
 	}
@@ -159,8 +162,9 @@ void Analyze::analyzeChannel(){
 	double rms = 0;
 	count = 0;
 	for( int s = 0 ; s < num ; s++ ){
+		if(  wf[s] < 10 ) continue;
+		if( (wf[s] & 0x3F ) == 0x0 || (wf[s] & 0x3F ) == 0x3F ) continue;
 		double value = wf[s];
-		if( value < 10 ) continue;
 		rms += (value-mean)*(value-mean);
 		count++;
 	}	
@@ -169,8 +173,7 @@ void Analyze::analyzeChannel(){
 
 	//fill channel waveform hists
 	for( int s = 0 ; s < num ; s++ ){
-		double value = wf[s];
-		hSampVsChan->Fill( chan, value);
+		hSampVsChan->Fill( chan, wf[s]);
 
 		//measure stuck code fraction
 		if( (wf[s] & 0x3F ) == 0x0 || (wf[s] & 0x3F ) == 0x3F )
