@@ -7,6 +7,7 @@ from femb_config_35t import FEMB_CONFIG
 from femb_udp_cmdline import FEMB_UDP
 import uuid
 import datetime
+import time
 
 class FEMB_ROOTDATA:
 
@@ -29,6 +30,7 @@ class FEMB_ROOTDATA:
 
         chan[0] = chanVal
         self.femb_config.selectChannel( chan[0]/16, chan[0] % 16)
+	time.sleep(0.1)
         for i in range(self.numpacketsrecord):
         	data = self.femb.get_data()
                 num[0] = 0
@@ -90,6 +92,7 @@ class FEMB_ROOTDATA:
 	for ch in range(0,128,1):
 		chan[0] = int(ch)
 		self.femb_config.selectChannel( chan[0]/16, chan[0] % 16)
+		time.sleep(0.1)
 		for i in range(self.numpacketsrecord):
         		data = self.femb.get_data()
         		num[0] = 0
