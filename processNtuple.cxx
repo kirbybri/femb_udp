@@ -26,6 +26,7 @@ TApplication *theApp;
 class Analyze {
 	public:
 	Analyze(std::string inputFileName);
+        int processFileName(std::string inputFileName, std::string &baseFileName);
 	void doAnalysis();
 	void analyzeChannel();
 
@@ -57,6 +58,7 @@ class Analyze {
 	TH2F *hRmsVsChan;
 	TProfile *pRmsVsChan;
 	TProfile *pFracStuckVsChan;
+	TProfile2D *pFFTVsChan;
 };
 
 Analyze::Analyze(std::string inputFileName){
@@ -98,7 +100,12 @@ Analyze::Analyze(std::string inputFileName){
 	tr_outmetadata = tr_metadata->CloneTree();
 
 	//make output file
-  	std::string outputFileName = "output_processNtuple_" + inputFileName;
+  	std::string outputFileName;
+	if( processFileName( inputFileName, outputFileName ) )
+		outputFileName = "output_processNtuple_" + outputFileName;
+	else
+		outputFileName = "output_processNtuple.root";
+
   	gOut = new TFile(outputFileName.c_str() , "RECREATE");
 
   	//initialize canvas
@@ -115,6 +122,34 @@ Analyze::Analyze(std::string inputFileName){
   	hRmsVsChan = new TH2F("hRmsVsChan","",numChan,0-0.5,numChan-0.5,300,0,300.);
   	pRmsVsChan = new TProfile("pRmsVsChan","",numChan,0-0.5,numChan-0.5);
 	pFracStuckVsChan = new TProfile("pFracStuckVsChan","",numChan,0-0.5,numChan-0.5);
+	pFFTVsChan = new TProfile2D("pFFTVsChan","",numChan,0-0.5,numChan-0.5,100,0,1);
+}
+
+int Analyze::processFileName(std::string inputFileName, std::string &baseFileName){
+        //check if filename is empty
+        if( inputFileName.size() == 0 ){
+                std::cout << "processFileName : Invalid filename " << std::endl;
+                return 0;
+        }
+
+        //remove path from name
+        size_t pos = 0;
+        std::string delimiter = "/";
+        while ((pos = inputFileName.find(delimiter)) != std::string::npos)
+                inputFileName.erase(0, pos + delimiter.length());
+
+	if( inputFileName.size() == 0 ){
+                std::cout << "processFileName : Invalid filename " << std::endl;
+                return 0;
+        }
+
+        //replace / with _
+        std::replace( inputFileName.begin(), inputFileName.end(), '/', '_'); // replace all 'x' to 'y'
+        std::replace( inputFileName.begin(), inputFileName.end(), '-', '_'); // replace all 'x' to 'y'
+
+	baseFileName = inputFileName;
+	
+	return 1;
 }
 
 void Analyze::doAnalysis(){
@@ -138,6 +173,7 @@ void Analyze::doAnalysis(){
   	hRmsVsChan->Write();
   	pRmsVsChan->Write();
 	pFracStuckVsChan->Write();
+	pFFTVsChan->Write();
   	gOut->Close();
 }
 
@@ -187,6 +223,28 @@ void Analyze::analyzeChannel(){
 	hRmsVsChan->Fill(chan, rms);
 	pRmsVsChan->Fill(chan, rms);
 
+	//load hits into TGraph, skip stuck codes
+	gCh->Set(0);
+	for( int s = 0 ; s < num ; s++ ){
+		if(  wf[s] < 10 ) continue;
+		if( (wf[s] & 0x3F ) == 0x0 || (wf[s] & 0x3F ) == 0x3F ) continue;
+		gCh->SetPoint(gCh->GetN() , s , wf[s] );
+	}
+	
+	//compute FFT
+	TH1F *hData = new TH1F("hData","",num,0,num);
+	for( int s = 0 ; s < num ; s++ ){
+		double adc = gCh->Eval(s);
+		hData->SetBinContent(s+1,adc);
+	}
+
+	TH1F *hFftData = new TH1F("hFftData","",num,0,num);
+    	hData->FFT(hFftData,"MAG");
+    	for(int i = 1 ; i < hFftData->GetNbinsX() ; i++ ){
+		double freq = 2.* i / (double) hFftData->GetNbinsX() ;
+		pFFTVsChan->Fill( chan, freq,  hFftData->GetBinContent(i+1) );
+	}
+
 	//draw waveform if wanted
 	if( 0 ){
 		gCh->Set(0);
@@ -199,12 +257,26 @@ void Analyze::analyzeChannel(){
 		gCh->GetXaxis()->SetTitle("Sample Number");
 		gCh->GetYaxis()->SetTitle("Sample Value (ADC counts)");
 		//gCh->GetXaxis()->SetRangeUser(0,128);
+		//gCh->GetXaxis()->SetRangeUser(0,num);
 		//gCh->GetYaxis()->SetRangeUser(500,1000);
 		gCh->Draw("ALP");
+		/*
+		c0->Divide(2);
+		c0->cd(1);
+		hData->Draw();
+		c0->cd(2);
+		hFftData->SetBinContent(1,0);
+		hFftData->GetXaxis()->SetRangeUser(0, hFftData->GetNbinsX()/2. );
+		hFftData->Draw();
+		*/
 		c0->Update();
-		char ct;
-		std::cin >> ct;
+		//char ct;
+		//std::cin >> ct;
+		usleep(1000);
 	}
+
+	delete hData;
+	delete hFftData;
 }
 
 void processNtuple(std::string inputFileName) {
