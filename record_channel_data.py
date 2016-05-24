@@ -9,8 +9,8 @@ if len(sys.argv) != 2 :
 	sys.exit(0)
 
 ch = int( sys.argv[1] )
-if (ch < 0) or (ch > 3):
-	print 'Invalid gain'
+if (ch < 0) or (ch > 127):
+	print 'Invalidi channel'
         sys.exit(0)
 
 femb_rootdata = FEMB_ROOTDATA()

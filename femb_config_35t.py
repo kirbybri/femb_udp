@@ -43,9 +43,9 @@ class FEMB_CONFIG:
 	self.femb.write_reg( 3, 0x01230000) #31 - enable ADC test pattern, 
 
 	#Set ADC latch_loc
-	self.femb.write_reg( self.REG_LATCHLOC, 0x66667656)
+	self.femb.write_reg( self.REG_LATCHLOC, 0x66666666)
 	#Set ADC clock phase
-	self.femb.write_reg( self.REG_CLKPHASE, 0x57)
+	self.femb.write_reg( self.REG_CLKPHASE, 0x55)
 
 	#internal test pulser control
 	self.femb.write_reg( 5, 0x02000001)
@@ -56,9 +56,6 @@ class FEMB_CONFIG:
 
 	#Set number events per header
 	self.femb.write_reg( 8, 0x0)
-
-	#ADC ASIC sync
-	self.femb.write_reg( 17, 0x0) # controls HS link, 0 for on, 1 for off
 
   	#FE ASIC SPI registers
 	print "Config FE ASIC SPI"
@@ -107,12 +104,16 @@ class FEMB_CONFIG:
         self.femb.write_reg( self.REG_ADCSPI_BASE + 33, 0x90609060)
         self.femb.write_reg( self.REG_ADCSPI_BASE + 34, 0x10001)	
 
+	#ADC ASIC sync
+        self.femb.write_reg( 17, 0x1) # controls HS link, 0 for on, 1 for off
+        self.femb.write_reg( 17, 0x0) # controls HS link, 0 for on, 1 for off	
+
 	#Write ADC ASIC SPI
 	print "Program ADC ASIC SPI"
 	self.femb.write_reg( self.REG_ASIC_SPIPROG, 1)
 	time.sleep(0.1)
-	self.femb.write_reg( self.REG_ASIC_SPIPROG, 1)
-	time.sleep(0.1)
+	#self.femb.write_reg( self.REG_ASIC_SPIPROG, 1)
+	#time.sleep(0.1)
 
 	#Write FE ASIC SPI
 	print "Program FE ASIC SPI"
@@ -121,6 +122,7 @@ class FEMB_CONFIG:
 	self.femb.write_reg( self.REG_ASIC_SPIPROG, 2)
 	time.sleep(0.1)
 
+	"""
 	print "Check ADC ASIC SPI"
 	for regNum in range(self.REG_ADCSPI_RDBACK_BASE,self.REG_ADCSPI_RDBACK_BASE+34,1):
         	val = self.femb.read_reg( regNum ) 
@@ -130,6 +132,7 @@ class FEMB_CONFIG:
 	for regNum in range(self.REG_FESPI_RDBACK_BASE,self.REG_FESPI_RDBACK_BASE+34,1):
 	        val = self.femb.read_reg( regNum)            
 	        print hex(val)
+	"""
 
     def selectChannel(self,asic,chan):
 	asicVal = int(asic)
@@ -190,10 +193,10 @@ class FEMB_CONFIG:
         self.femb.write_reg( self.REG_ASIC_SPIPROG, 2)
         time.sleep(0.1)
 
-	print "Check FE ASIC SPI"
-        for regNum in range(self.REG_FESPI_RDBACK_BASE,self.REG_FESPI_RDBACK_BASE+34,1):
-                val = self.femb.read_reg( regNum)
-                print hex(val)
+	#print "Check FE ASIC SPI"
+        #for regNum in range(self.REG_FESPI_RDBACK_BASE,self.REG_FESPI_RDBACK_BASE+34,1):
+        #        val = self.femb.read_reg( regNum)
+        #        print hex(val)
 
     def syncADC(self):
 	#turn on ADC test mode
@@ -220,10 +223,10 @@ class FEMB_CONFIG:
 	
 	#loop through channels, check test pattern against data
 	badSync = 0
-	for ch in range(0,15,1):
+	for ch in range(0,16,1):
 		self.selectChannel(adcNum,ch)
 		time.sleep(0.1)		
-		for test in range(0,10,1):
+		for test in range(0,1000,1):
 			data = self.femb.get_data()
 			for samp in data:
 				chNum = ((samp >> 12 ) & 0xF)
