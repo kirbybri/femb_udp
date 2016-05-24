@@ -72,8 +72,33 @@ class FEMB_UDP:
         #dataNtuple = struct.unpack_from(">496H",data[16:])
 	dataNtuple = struct.unpack_from(">512H",data)
         sock_data.close()
-        return dataNtuple[16:]
+        return dataNtuple[8:]
 	#return dataNtuple
+
+    def get_data_packets(self, val):
+	numVal = int(val)
+        if (numVal < 0) or (numVal > self.MAX_NUM_PACKETS):
+                print "Error record_hs_data: Invalid number of data packets requested"
+                return None
+
+        #set up listening socket
+        sock_data = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Internet, UDP
+        sock_data.bind(('',self.UDP_PORT_HSDATA))
+        sock_data.settimeout(2)
+
+	#write N data packets to file
+	rawdataPackets = []
+        for packet in range(0,numVal,1):
+                data = sock_data.recv(1024)
+		rawdataPackets.append(data)
+	sock_data.close()
+
+	dataPackets = []
+	for rawdata in rawdataPackets:
+		data = struct.unpack_from(">512H",rawdata)
+		data = data[8:]
+		dataPackets.append(data)
+	return dataPackets
 
     def record_binary_data(self, val):
 	numVal = int(val)
