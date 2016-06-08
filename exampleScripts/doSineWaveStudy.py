@@ -10,7 +10,7 @@ femb_rootdata = FEMB_ROOTDATA()
 
 #configure asics
 g=0
-s=2
+s=0
 b=0
 femb_config.configFeAsic(g,s,b)
 
@@ -19,16 +19,22 @@ chan = 0
 femb_config.selectChannel(int(chan)/16, int(chan)%16)
 
 #initialize generator - sine wave function arguments freq[Hz] ampl[V] offset[V]
-call(["/home/jack/pulserControl/setSineWave.py","1000","0.250","0"])
+call(["/home/jack/pulserControl/setSineWave.py","660000","0.250","0"])
+call(["python","/home/jack/pulserControl/turnOnOutput.py"])
+
+#initialize output filelist
+filelist = open("filelist_output_femb_rootdata_sineWaveStudy_" + str(femb_rootdata.date) + ".txt", "w")
 
 subrun = 0
-for fstep in range(0,500,10):
-	freq = int(fstep)*1000 + 333
+for fstep in range(0,100,1):
+#for fstep in range(0,10,1):
+	#freq = int(fstep)*1000 + 333
+	freq = int(fstep)*10000 + 357
 	call(["/home/jack/pulserControl/setSineWave.py",str(freq),"0.250","0"])
-	filename = "output_femb_rootdata_sineWaveStudy_" + str(femb_rootdata.date) + "_"  + str(subrun) + ".root"
+	filename = "data/output_femb_rootdata_sineWaveStudy_" + str(femb_rootdata.date) + "_"  + str(subrun) + ".root"
 	print "Recording " + filename
 	femb_rootdata.filename = filename
-	femb_rootdata.numpacketsrecord = 50
+	femb_rootdata.numpacketsrecord = 10
 	femb_rootdata.run = 0
         femb_rootdata.subrun = subrun
         femb_rootdata.runtype = 10
@@ -42,3 +48,7 @@ for fstep in range(0,500,10):
 	#femb_rootdata.record_data_run()
 	femb_rootdata.record_channel_data(0)
 	subrun = subrun + 1
+	filelist.write(filename + "\n")
+
+filelist.close()
+call(["python","/home/jack/pulserControl/turnOffOutput.py"])
