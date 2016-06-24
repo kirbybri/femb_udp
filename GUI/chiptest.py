@@ -195,10 +195,10 @@ class AnotherWindow(Gtk.Window):
                 plot_data_button.connect("clicked", self.call_plot_data)
                 vbox5.pack_start(plot_data_button, True, True, 0)
 
-                #plot_fft_button = Gtk.Button.new_with_label("Plot FFT")
-                #plot_fft_button.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse('blue'))
-                #plot_fft_button.connect("clicked", self.call_plot_fft)
-                #vbox5.pack_start(plot_fft_button, True, True, 0)
+                plot_fft_button = Gtk.Button.new_with_label("Plot FFT")
+                plot_fft_button.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse('blue'))
+                plot_fft_button.connect("clicked", self.call_plot_fft)
+                vbox5.pack_start(plot_fft_button, True, True, 0)
 
                 read_reg_button = Gtk.Button.new_with_label("Read Register")
                 read_reg_button.connect("clicked", self.call_read_reg)
@@ -270,12 +270,12 @@ class AnotherWindow(Gtk.Window):
                 subw = DataViewWindow(data)
 
         def call_plot_data(self, button):
-                data = subprocess.check_output(["python", "plot_data_fast.py"])
+                data = subprocess.check_output(["python", "pyroot_plot.py"])
                 subw = DataViewWindow(data)
 
-        #def call_plot_fft(self, button):
-        #        data = subprocess.check_output(["python", "plot_fft_fast.py"])
-        #        subw = DataViewWindow(data)
+        def call_plot_fft(self, button):
+                data = subprocess.check_output(["python", "plot_fft.py"])
+                subw = DataViewWindow(data)
 
         def call_read_reg(self, button):
                 data = subprocess.check_output(["python", "read_reg.py"])
