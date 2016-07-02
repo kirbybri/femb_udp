@@ -10,11 +10,11 @@ class FEMB_UDP:
 
     def write_reg(self, reg , data ):
         regVal = int(reg)
-        if (regVal < 0) or (regVal > self.MAX_REG_VAL):
+        if (regVal < 0) or (regVal > self.MAX_REG_NUM):
                 print "Error write_reg: Invalid register number"
                 return None
         dataVal = int(data)
-        if (dataVal < 0) or (dataVal > 0xFFFFFFFF):
+        if (dataVal < 0) or (dataVal > self.MAX_REG_VAL):
                 print "Error write_reg: Invalid data value"
                 return None
 
@@ -32,7 +32,7 @@ class FEMB_UDP:
 
     def write_reg_bits(self, reg , pos, mask, data ):
         regVal = int(reg)
-        if (regVal < 0) or (regVal > self.MAX_REG_VAL):
+        if (regVal < 0) or (regVal > self.MAX_REG_NUM):
                 print "Error write_reg_bits: Invalid register number"
                 return None
 	posVal = int(pos)
@@ -44,27 +44,27 @@ class FEMB_UDP:
 		print "Error write_reg_bits: Invalid bit mask"
                 return None
 	dataVal = int(data)
-        if (dataVal < 0) or (dataVal > 0xFFFFFFFF):
+        if (dataVal < 0) or (dataVal > self.MAX_REG_VAL):
                 print "Error write_reg_bits: Invalid data value"
                 return None
 	if dataVal > maskVal :
 		print "Error write_reg_bits: Write value does not fit within mask"
                 return None
-	if (maskVal << posVal) > 0xFFFFFFFF:
+	if (maskVal << posVal) > self.MAX_REG_VAL:
 		print "Error write_reg_bits: Write range exceeds register size"
                 return None
 
 	#get initial register value
 	initReg = self.read_reg( regVal )
 	initRegVal = int(initReg)
-	if (initRegVal < 0) or (initRegVal > 0xFFFFFFFF):
+	if (initRegVal < 0) or (initRegVal > self.MAX_REG_VAL):
                 print "Error write_reg_bits: Invalid initial register value"
                 return None
 
 	shiftVal = (dataVal & maskVal)
 	regMask = (maskVal << posVal)
 	newRegVal = ( (initRegVal & ~(regMask)) | (shiftVal  << posVal) ) 
-	if (newRegVal < 0) or (newRegVal > 0xFFFFFFFF):
+	if (newRegVal < 0) or (newRegVal > self.MAX_REG_VAL):
                 print "Error write_reg_bits: Invalid new register value"
                 return None
 
@@ -82,7 +82,7 @@ class FEMB_UDP:
 
     def read_reg(self, reg ):
         regVal = int(reg)
-        if (regVal < 0) or (regVal > self.MAX_REG_VAL):
+        if (regVal < 0) or (regVal > self.MAX_REG_NUM):
                 print "Error read_reg: Invalid register number"
                 return None
 
@@ -99,7 +99,13 @@ class FEMB_UDP:
         sock_read.close()
 
         #try to receive response packet from board, store in hex
-        data = sock_readresp.recv(4096)
+	data = []
+	try:
+        	data = sock_readresp.recv(4096)
+	except socket.timeout:
+		print "Error read_reg: No read packet received from board, quitting"
+		sock_readresp.close()
+		return -1	
         dataHex = data.encode('hex')
         sock_readresp.close()
 
@@ -114,10 +120,16 @@ class FEMB_UDP:
         #set up listening socket
         sock_data = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Internet, UDP
         sock_data.bind(('',self.UDP_PORT_HSDATA))
+	sock_data.settimeout(2)
 
 	#receive data, don't pause if no response
-	sock_data.settimeout(2)
-        data = sock_data.recv(1024)
+	data = []
+	try:
+        	data = sock_data.recv(1024)
+	except socket.timeout:
+		print "Error get_data: No data packet received from board, quitting"
+		sock_data.close()
+		return []
 
 	#extract 496 data words from binary buffer, first 16 bytes are header
         #dataNtuple = struct.unpack_from(">496H",data[16:])
@@ -140,7 +152,13 @@ class FEMB_UDP:
 	#write N data packets to file
 	rawdataPackets = []
         for packet in range(0,numVal,1):
-                data = sock_data.recv(1024)
+		data = []
+		try:
+                	data = sock_data.recv(1024)
+		except socket.timeout:
+			print "Error get_data_packets: No data packet received from board, quitting"
+			sock_data.close()
+			return []
 		rawdataPackets.append(data)
 	sock_data.close()
 
@@ -167,7 +185,14 @@ class FEMB_UDP:
 
 	#write N data packets to file
 	for packet in range(0,numVal,1):
-		data = sock_data.recv(1024)
+		data = []
+		try:
+			data = sock_data.recv(1024)
+		except socket.timeout:
+			print "Error record_binary_data: No data packet received from board, quitting"
+			sock_data.close()
+			FILE.close()
+			return
 		#dataNtuple = struct.unpack_from(">512H",data)
 		#print dataNtuple[8:]
 		FILE.write(data)
@@ -185,5 +210,6 @@ class FEMB_UDP:
 	self.UDP_PORT_RREG = 32001
 	self.UDP_PORT_RREGRESP = 32002
 	self.UDP_PORT_HSDATA = 32003
-	self.MAX_REG_VAL = 666 
+	self.MAX_REG_NUM = 666
+	self.MAX_REG_VAL = 0xFFFFFFFF
 	self.MAX_NUM_PACKETS = 1000
