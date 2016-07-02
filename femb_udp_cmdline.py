@@ -29,6 +29,50 @@ class FEMB_UDP:
         sock_write.sendto(WRITE_MESSAGE,(self.UDP_IP, self.UDP_PORT_WREG ))
         sock_write.close()
 
+    def write_reg_bits(self, reg , pos, mask, data ):
+        regVal = int(reg)
+        if (regVal < 0) or (regVal > self.MAX_REG_VAL):
+                print "Error write_reg_bits: Invalid register number"
+                return None
+	posVal = int(pos)
+	if (posVal < 0 ) or (posVal > 31):
+		print "Error write_reg_bits: Invalid register position"
+                return None
+	maskVal = int(mask)
+	if (maskVal < 0 ) or (maskVal > 31):
+		print "Error write_reg_bits: Invalid bit mask"
+                return None
+	dataVal = int(data)
+        if (dataVal < 0) or (dataVal > 0xFFFFFFFF):
+                print "Error write_reg_bits: Invalid data value"
+                return None
+
+	#get initial register value
+	initReg = self.read_reg( regVal )
+	initRegVal = int(initReg)
+	if (initRegVal < 0) or (initRegVal > 0xFFFFFFFF):
+                print "Error write_reg_bits: Invalid initial register value"
+                return None
+
+	shiftVal = (dataVal & maskVal)
+	regMask = (maskVal << posVal)
+	newRegVal = ( (initRegVal & ~(regMask)) | (shiftVal  << posVal) ) 
+	if (newRegVal < 0) or (newRegVal > 0xFFFFFFFF):
+                print "Error write_reg_bits: Invalid new register value"
+                return None
+
+        #crazy packet structure require for UDP interface
+        dataValMSB = ((newRegVal >> 16) & 0xFFFF)
+        dataValLSB = newRegVal & 0xFFFF
+	WRITE_MESSAGE = struct.pack('HHHHHHHHH',socket.htons( self.KEY1  ), socket.htons( self.KEY2 ),socket.htons(regVal),socket.htons(dataValMSB),
+                socket.htons(dataValLSB),socket.htons( self.FOOTER  ), 0x0, 0x0, 0x0  )
+
+	#send packet to board, don't do any checks
+        sock_write = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Internet, UDP
+        sock_write.setblocking(0)
+        sock_write.sendto(WRITE_MESSAGE,(self.UDP_IP, self.UDP_PORT_WREG ))
+        sock_write.close()
+
     def read_reg(self, reg ):
         regVal = int(reg)
         if (regVal < 0) or (regVal > self.MAX_REG_VAL):
