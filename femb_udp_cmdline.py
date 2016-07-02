@@ -4,6 +4,7 @@ import struct
 import sys 
 import string
 import socket
+from socket import AF_INET, SOCK_DGRAM
 
 class FEMB_UDP:
 
@@ -45,6 +46,12 @@ class FEMB_UDP:
 	dataVal = int(data)
         if (dataVal < 0) or (dataVal > 0xFFFFFFFF):
                 print "Error write_reg_bits: Invalid data value"
+                return None
+	if dataVal > maskVal :
+		print "Error write_reg_bits: Write value does not fit within mask"
+                return None
+	if (maskVal << posVal) > 0xFFFFFFFF:
+		print "Error write_reg_bits: Write range exceeds register size"
                 return None
 
 	#get initial register value
