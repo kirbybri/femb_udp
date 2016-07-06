@@ -3,7 +3,7 @@
 import string
 from ROOT import TFile, TTree
 from array import array
-from femb_config_35t import FEMB_CONFIG
+from femb_config import FEMB_CONFIG
 from femb_udp_cmdline import FEMB_UDP
 import uuid
 import datetime

@@ -7,7 +7,7 @@ import socket
 import struct
 import datetime
 import uuid
-from femb_config_35t import FEMB_CONFIG
+from femb_config import FEMB_CONFIG
 import time
 from femb_rootdata import FEMB_ROOTDATA
 import math

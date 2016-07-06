@@ -3,7 +3,7 @@
 import sys
 
 #specify which version of the board used here
-from femb_config_35t import FEMB_CONFIG
+from femb_config import FEMB_CONFIG
 
 femb_config = FEMB_CONFIG()
 
