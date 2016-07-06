@@ -32,7 +32,7 @@ class FEMB_CONFIG:
 	time.sleep(0.5)
 
 	#Set ADC test pattern register
-	self.femb.write_reg( 3, 0x81230000) #31 - enable ADC test pattern, 
+	self.femb.write_reg( 3, 0x01230000) #31 - enable ADC test pattern, 
 
 	#Set ADC latch_loc
 	self.femb.write_reg( self.REG_LATCHLOC, 0x66666666)

@@ -13,7 +13,7 @@ class FEMB_ROOTDATA:
 
     def record_channel_data(self, ch):
 	chanVal = int(ch)
-	if (chanVal < 0 ) or (chanVal > 127):
+	if (chanVal < self.minchan ) or (chanVal > self.maxchan ):
 		print "error"
 		return	
 
@@ -89,7 +89,7 @@ class FEMB_ROOTDATA:
 	t.Branch( 'num', num, 'num/i' )
 	t.Branch( 'wf', wf, 'wf[num]/s' )
 
-	for ch in range(0,128,1):
+	for ch in range(self.minchan,self.maxchan+1,1):
 		chan[0] = int(ch)
 		self.femb_config.selectChannel( chan[0]/16, chan[0] % 16)
 		time.sleep(0.01)
@@ -161,6 +161,8 @@ class FEMB_ROOTDATA:
 	self.gain = 0
 	self.shape = 0
 	self.base = 0
+	self.minchan = 0
+	self.maxchan = 127
 	#initialize FEMB UDP object
 	self.femb = FEMB_UDP()
 	self.femb_config = FEMB_CONFIG()
