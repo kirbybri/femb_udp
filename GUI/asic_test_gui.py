@@ -29,10 +29,10 @@ class AnotherWindow(Gtk.Window):
                 
 ############# change take validation data to ----- asic test scipt #############
 
-                validation_data_button = Gtk.Button.new_with_label("Take Validation Data Set")
-                validation_data_button.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse('blue'))
-                validation_data_button.connect("clicked", self.call_validation_data)
-                vbox4.pack_start(validation_data_button, True, True, 0)
+                plot_data_button = Gtk.Button.new_with_label("PlotData")
+                plot_data_button.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse('blue'))
+                plot_data_button.connect("clicked", self.call_plot_data)
+                vbox4.pack_start(plot_data_button, True, True, 0)
 
                 hbox.pack_start(vbox4, True, True, 0) 
 
@@ -45,7 +45,7 @@ class AnotherWindow(Gtk.Window):
 
 
         def call_validation_data(self, button):
-                subprocess.check_output(["python", "take_validation_data_set.py"])
+                subprocess.check_output(["python", "pyroot_plot.py"])
 
 
 class ChipTestWindow(Gtk.Window):
