@@ -3,7 +3,12 @@
 import sys
 
 #specify which version of the board used here
-from femb_config import FEMB_CONFIG
+#from femb_config import FEMB_CONFIG
+
+#from setup_gui import *
+from setup_config import *
+femb_config = config.FEMB_CONFIG()
+
 
 if len(sys.argv) != 4 :
 	print 'Invalid # of arguments, usage python config_feasic <gain:0-3> <shaping time:0-3> <baseline:0-1>'
@@ -24,7 +29,7 @@ if (baseVal < 0) or (baseVal > 1):
         print 'Invalid baseline'
         sys.exit(0)
 
-femb_config = FEMB_CONFIG()
+#femb_config = FEMB_CONFIG()
 
 print "START ASIC CONFIG"
 femb_config.configFeAsic(gainVal,shapeVal,baseVal)
