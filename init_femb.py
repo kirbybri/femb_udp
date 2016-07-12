@@ -1,8 +1,11 @@
 #!/usr/bin/env python33
 import sys
 import importlib
-mod = str(sys.argv[1])
 
+#print 'doing something...'
+
+config_type = sys.argv[1]
+mod = "femb_config_" + config_type
 config = importlib.import_module(mod)
 
 #from femb_config import FEMB_CONFIG
@@ -11,7 +14,7 @@ config = importlib.import_module(mod)
 #from setup_gui import *
 #from setup_config import *
 femb_config = config.FEMB_CONFIG()
-print "Configuring board..."
+print "Configuring board with configration of ", config_type
 print "START CONFIG"
 femb_config.initBoard()
 print "END CONFIG"
