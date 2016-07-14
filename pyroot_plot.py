@@ -18,7 +18,7 @@ c = ROOT.TCanvas()
 #c.Update()
 #c.Modified()
 
-l_first = 1
+#l_first = 1
 
 while 1:
 #for i in range(0,10,1):
@@ -50,6 +50,8 @@ while 1:
 #        h.GetYaxis().SetTitle("Waveform")
         g = ROOT.TGraph(num,xpoint,ypoint)
         #g.SetMarkerStyle(kFullDotMedium)
+	for l in range (0,1000000000000,10000):
+		l_first = 1
 	if l_first:
 		
 		#g.Draw("AL")

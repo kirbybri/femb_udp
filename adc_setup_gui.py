@@ -65,7 +65,8 @@ class ConfigWindow(Gtk.Window):
         
         def call_configboard(self,button):
                 #config_type = str(self.config_combo.get_active_text())
-                config_type = "adcTest"
+                global config_type
+		config_type = "adcTest"
                 mod = "femb_config_" + config_type
                 #mod = "femb_config_adcTest"
 
