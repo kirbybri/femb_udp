@@ -65,14 +65,14 @@ class ConfigWindow(Gtk.Window):
         
         def call_configboard(self,button):
                 #config_type = str(self.config_combo.get_active_text())
-                #config_type = "adcTest"
-                #mod = "femb_config" + config_type
-                mod = "femb_config_adcTest"
+                config_type = "adcTest"
+                mod = "femb_config_" + config_type
+                #mod = "femb_config_adcTest"
 
                 global config
                 config = importlib.import_module(mod)
 
-                data = subprocess.check_output(["python", "init_femb.py", mod])
+                data = subprocess.check_output(["python", "init_femb.py", config_type])
                 subw = OutputWindow(data)
 
                 Gtk.main_quit()

@@ -11,8 +11,12 @@ import struct
 
 
 femb = FEMB_UDP()
-#while 1:
-for i in range(0,10,1):
+
+hist_real = 0
+c = ROOT.TCanvas()
+
+while 1:
+#for i in range(0,10,1):
 	data = femb.get_data()
 	xpoint = []
 	ypoint = []
@@ -33,35 +37,32 @@ for i in range(0,10,1):
 	num = int(num)
 	#print num
 	length = np.array(num, dtype='intc')
-	ypoint = np.array(ypoint, dtype = 'float')	
+	y = np.array(ypoint, dtype = 'float')	
 
-	fft = ROOT.TVirtualFFT.FFT(1, length, "R2C")
-	fft.SetPoints(ypoint)
+	fft = ROOT.TVirtualFFT.FFT(1, length, "R2C ES K")
+	fft.SetPoints(y)
 	fft.Transform()
-	#fft.GetPoints(ypoint)
 	
-	#re = float([length])
-	#im = float([length])
-	#fft = ROOT.TVirtualFFT.FFT(1, length, "C2R")	
-	#fft.SetPointsComplex(re, im)
-	#fft.Transform()
-	#ypoint = fft(ypoint)
-	
+	hist_real = 0
+	#hist_real = ROOT.TH1F()
+	#hist_real.Fill(0)
+	hist_real = ROOT.TH1F("","",500,0,2000)
+	#hist_real.SetDirectory(0)
+	hist_real = ROOT.TH1F.TransformHisto(fft, hist_real, "MAG")
+	#hist_real.GetXaxis().SetRange(-100,100)
+	#h = c.DrawFrame(-100,100)
+	#hist_real.GetBin(200)
+	#hist_real = ROOT.TH1F.TransformHisto(fft, hist_real, "RE")
+	hist_real.SetTitle("FFT of Waveform")
+	hist_real.GetXaxis().SetTitle("Frequency (kHz)")
+	hist_real.GetYaxis().SetTitle("")
+	hist_real.Draw()
+	c.Update()
+	c.Modified()
+	#time.sleep(1)
 
-	xpoint = np.array(xpoint)
-	ypoint = np.array(fft)
-	#y_fft = np.fft.fft(ypoint, 1)
-	#print y_fft
-	#ypoint = (1.0/num) * np.abs(y_fft)
-
-        c = ROOT.TCanvas()
-        h = c.DrawFrame(-1,90,505,150)
-        h.GetXaxis().SetTitle("Channel Number")
-        h.GetYaxis().SetTitle("Waveform")
-        g = ROOT.TGraph(num,xpoint,ypoint)
-        #g.SetMarkerStyle(kFullDotMedium)
-        c.Update()
-        c.Modified()
-        g.Draw("AP")
-        time.sleep(1)
-
+	#hist_im = ROOT.TH1D("","",1100,-100,1000)	
+	#hist_im = ROOT.TH1.TransformHisto(fft, hist_im, "IM")
+	#hist_im.SetTitle("Imaginary part of transform")
+	#hist_im.Draw()
+	#time.sleep(.5)

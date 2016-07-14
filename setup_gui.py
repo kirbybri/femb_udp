@@ -28,7 +28,7 @@ class OutputWindow(Gtk.Window):
                 self.textbuffer = self.textview.get_buffer()
                 self.textbuffer.set_text(self.data)
                 scrolledwindow.add(self.textview)
-		#Gtk.main_quit()
+		Gtk.main_quit()
 
 
 
@@ -59,7 +59,8 @@ class ConfigWindow(Gtk.Window):
 
         
         def call_configboard(self,button):
-                config_type = str(self.config_combo.get_active_text())
+                global config_type
+		config_type = str(self.config_combo.get_active_text())
                 mod = "femb_config_" + config_type
 
                 global config 
@@ -68,7 +69,7 @@ class ConfigWindow(Gtk.Window):
 		data = subprocess.check_output(["python", "init_femb.py", config_type])
 		subw = OutputWindow(data)
                 
-		#Gtk.main_quit()
+		Gtk.main_quit()
 
 
 

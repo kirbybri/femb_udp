@@ -13,10 +13,34 @@ from femb_udp_cmdline import FEMB_UDP
 import subprocess
 import time
 
+class DataViewWindow(Gtk.Window):
+
+        def __init__(self, data):
+                Gtk.Window.__init__(self, title="View Data Output")
+                self.data = data
+                self.grid = Gtk.Grid()
+                self.add(self.grid)
+                self.create_textview()
+                #self.save_button()
+                
+                self.show_all()
+
+        def create_textview(self):
+                scrolledwindow = Gtk.ScrolledWindow()
+                scrolledwindow.set_hexpand(True)
+                scrolledwindow.set_vexpand(True)
+                self.grid.attach(scrolledwindow, 0, 1, 3, 1)
+
+                self.textview = Gtk.TextView()
+                self.textbuffer = self.textview.get_buffer()
+                self.textbuffer.set_text(self.data)
+                scrolledwindow.add(self.textview)
+
+
 class ChipTestWindow(Gtk.Window):
 
         def __init__(self):
-                Gtk.Window.__init__(self, title="Front End Chip Test Log")
+                Gtk.Window.__init__(self, title="Live Feed")
 
                 self.femb_config = config.FEMB_CONFIG()
                 self.femb_rootdata = FEMB_ROOTDATA()
@@ -37,7 +61,30 @@ class ChipTestWindow(Gtk.Window):
                 plot_fft_button.connect("clicked", self.call_plot_fft)
                 vbox5.pack_start(plot_fft_button, True, True, 0)
 
-                hbox.pack_start(vbox5, True, True, 0)
+		hbox.pack_start(vbox5, True, True, 0)
+
+            	vbox2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+		asicVal_label = Gtk.Label("ASIC")
+                vbox2.pack_start(asicVal_label, True, True, 0)
+                self.asicVal_combo = Gtk.ComboBoxText()
+                self.asicVal_combo.set_entry_text_column(0)
+                for i in range(8):
+                        self.asicVal_combo.append_text(str(i))
+                vbox2.pack_start(self.asicVal_combo,False,False,0)
+
+                channelVal_label = Gtk.Label("Channel")
+                vbox2.pack_start(channelVal_label, True, True, 0)
+                self.channelVal_combo = Gtk.ComboBoxText()
+                self.channelVal_combo.set_entry_text_column(0)
+                for i in range(16):
+                        self.channelVal_combo.append_text(str(i))
+                vbox2.pack_start(self.channelVal_combo,False,False,0)
+	
+                selectChannel_button = Gtk.Button.new_with_label("Select Channel")
+                selectChannel_button.connect("clicked", self.call_selectChannel)
+                vbox2.pack_start(selectChannel_button, True, True, 0)
+
+		hbox.pack_start(vbox2, True, True, 0)
                 
                 scrolledwindow = Gtk.ScrolledWindow()
                 scrolledwindow.set_hexpand(True)
@@ -54,6 +101,14 @@ class ChipTestWindow(Gtk.Window):
         def call_plot_fft(self, button):
                 data = subprocess.check_output(["python", "plot_fft.py"])
                 #subw = DataViewWindow(data)
+
+
+        def call_selectChannel(self, button):
+                asic = str(self.asicVal_combo.get_active_text())
+                channel = str(self.channelVal_combo.get_active_text())
+                #self.femb_config.selectChannel(asic, channel)
+		data = subprocess.check_output(["python", "select_channel.py",config_type, asic, channel])
+		subw = DataViewWindow(data)
 
 
 win = ChipTestWindow()

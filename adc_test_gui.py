@@ -60,6 +60,64 @@ class PlottingWindow(Gtk.Window):
                 scrolledwindow.add(self.textview)
                 Gtk.main_quit()
 """
+class AnotherWindow(Gtk.Window):
+
+        def __init__(self):
+                Gtk.Window.__init__(self, title="Testing Window")
+                self.connect("destroy", lambda x: Gtk.main_quit())
+
+                self.femb_config = config.FEMB_CONFIG()
+                self.femb_rootdata = FEMB_ROOTDATA()
+                self.femb_udp = FEMB_UDP()
+
+                hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+                self.add(hbox)
+                vbox2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+
+                dotest_button = Gtk.Button.new_with_label("Do ADC Test")
+                dotest_button.connect("clicked", self.call_dotest)
+                vbox2.pack_start(dotest_button, True, True, 0)
+
+                button = Gtk.CheckButton("Plot Waveform")
+                button.connect("toggled", self.call_plot, "Plot Waveform")
+                vbox2.pack_start(button, True, True, 2)
+
+                button = Gtk.CheckButton("Plot FFT")
+                button.connect("toggled", self.call_plot)
+                vbox2.pack_start(button, True, True, 2)
+
+                hbox.pack_start(vbox2, True, True, 0)
+                
+                scrolledwindow = Gtk.ScrolledWindow()
+                scrolledwindow.set_hexpand(True)
+                scrolledwindow.set_vexpand(True)
+
+                self.show_all()
+
+        def call_plot(self, button, name):
+		if button.get_active():
+			state = "on"
+			if name == "Plot Waveform":
+				data = subprocess.check_output(["python", "pyroot_plot.py"])
+                		subw = DataViewWindow(data)
+			elif name == "Plot FFT":
+				data = subprocess.check_output(["python", "plot_fft.py"])
+                		subw = DataViewWindow(data)
+
+		else:
+			state = "off"
+
+
+                #data = subprocess.check_output(["python", "pyroot_plot.py"])
+                #subw = DataViewWindow(data)
+
+        def call_plot_fft(self, button):
+                data = subprocess.check_output(["python", "plot_fft.py"])
+                subw = DataViewWindow(data)
+
+	def call_dotest(self, button):
+		data = subprocess.check_output(['python','doAdcTest_extPulser_DCscan.py'])
+		subw = DataViewWindow(data)
 
 class ChipTestWindow(Gtk.Window):
 
@@ -124,10 +182,11 @@ class ChipTestWindow(Gtk.Window):
                 f.close()
 
                 #data1 = subprocess.check_output(["python", "doAdcTest_extPulser_DCscan.py"])
-                data2 = subprocess.check_output(["python", "pyroot_plot.py"])
+                #data2 = subprocess.check_output(["python", "pyroot_plot.py"])
 
                 #subw = OutputWindow(data1)  
-                subw = DataViewWindow(data2)
+                #subw = DataViewWindow(data2)
+		subw = AnotherWindow()
                     
     
 

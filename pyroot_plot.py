@@ -60,6 +60,9 @@ while 1:
 		ymin = ymin - ymiddle
 		ymax = ymax + ymiddle
 		h = c.DrawFrame(-1,ymin,505,ymax)
+		h.SetTitle("Waveform Channel chNum")
+		h.GetXaxis().SetTitle("Time")
+		h.GetYaxis().SetTitle("Waveform")
 		l_first = 0
 
 	g.Draw("L")
