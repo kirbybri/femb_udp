@@ -18,7 +18,7 @@ c = ROOT.TCanvas()
 #c.Update()
 #c.Modified()
 
-#l_first = 1
+l_first = 100
 
 while 1:
 #for i in range(0,10,1):
@@ -50,9 +50,9 @@ while 1:
 #        h.GetYaxis().SetTitle("Waveform")
         g = ROOT.TGraph(num,xpoint,ypoint)
         #g.SetMarkerStyle(kFullDotMedium)
-	for l in range (0,1000000000000,10000):
-		l_first = 1
-	if l_first:
+	#for l in range (0,1000000000000,10000):
+	#	l_first = 1
+	if (l_first == 100):
 		
 		#g.Draw("AL")
 		#h = c.DrawFrame(-1,90,505,150)
@@ -62,11 +62,13 @@ while 1:
 		ymin = ymin - ymiddle
 		ymax = ymax + ymiddle
 		h = c.DrawFrame(-1,ymin,505,ymax)
-		h.SetTitle("Waveform Channel chNum")
+		h.SetTitle("Live feed Waveform")
 		h.GetXaxis().SetTitle("Time")
 		h.GetYaxis().SetTitle("Waveform")
 		l_first = 0
 
+	l_first += 1
+	#print l_first
 	g.Draw("L")
 	c.Update()
 	c.Modified()

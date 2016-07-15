@@ -14,7 +14,7 @@ femb = FEMB_UDP()
 
 hist_real = 0
 c = ROOT.TCanvas()
-
+c.SetLogy()
 while 1:
 #for i in range(0,10,1):
 	data = femb.get_data()
@@ -55,7 +55,7 @@ while 1:
 	#hist_real = ROOT.TH1F.TransformHisto(fft, hist_real, "RE")
 	hist_real.SetTitle("FFT of Waveform")
 	hist_real.GetXaxis().SetTitle("Frequency (kHz)")
-	hist_real.GetYaxis().SetTitle("")
+	hist_real.GetYaxis().SetTitle("Log Scale")
 	hist_real.Draw()
 	c.Update()
 	c.Modified()

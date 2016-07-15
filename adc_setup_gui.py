@@ -10,6 +10,7 @@ class OutputWindow(Gtk.Window):
 
         def __init__(self, data):
                 Gtk.Window.__init__(self, title="View Output")
+		self.set_size_request(400,800)
                 self.data = data
                 self.grid = Gtk.Grid()
                 self.add(self.grid)
@@ -29,7 +30,7 @@ class OutputWindow(Gtk.Window):
                 self.textbuffer.set_text(self.data)
                 scrolledwindow.add(self.textview)
                 #print "Configuring board..."
-                Gtk.main_quit()
+                #Gtk.main_quit()
 
 
 
@@ -60,6 +61,10 @@ class ConfigWindow(Gtk.Window):
                 config_button.connect("clicked", self.call_configboard)
                 vbox.pack_start(config_button, True, True, 0)
 
+                init_button = Gtk.Button.new_with_label("Init Board")
+                init_button.connect("clicked", self.call_init)
+                vbox.pack_start(init_button, True, True, 0)
+
                 self.add(vbox)
 
         
@@ -73,10 +78,13 @@ class ConfigWindow(Gtk.Window):
                 global config
                 config = importlib.import_module(mod)
 
+		Gtk.main_quit()
+
+	def call_init(self,button):
                 data = subprocess.check_output(["python", "init_femb.py", config_type])
                 subw = OutputWindow(data)
 
-                Gtk.main_quit()
+                #Gtk.main_quit()
                 
 
 

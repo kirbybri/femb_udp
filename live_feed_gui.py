@@ -17,6 +17,7 @@ class DataViewWindow(Gtk.Window):
 
         def __init__(self, data):
                 Gtk.Window.__init__(self, title="View Data Output")
+		self.set_size_request(400,900)
                 self.data = data
                 self.grid = Gtk.Grid()
                 self.add(self.grid)
@@ -61,6 +62,7 @@ class ChipTestWindow(Gtk.Window):
                 plot_fft_button.connect("clicked", self.call_plot_fft)
                 vbox5.pack_start(plot_fft_button, True, True, 0)
 
+
 		hbox.pack_start(vbox5, True, True, 0)
 
             	vbox2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
@@ -68,8 +70,9 @@ class ChipTestWindow(Gtk.Window):
                 vbox2.pack_start(asicVal_label, True, True, 0)
                 self.asicVal_combo = Gtk.ComboBoxText()
                 self.asicVal_combo.set_entry_text_column(0)
-                for i in range(8):
-                        self.asicVal_combo.append_text(str(i))
+                #for i in range(8):
+                	#self.asicVal_combo.append_text(str(i))
+		self.asicVal_combo.append_text(str(0))
                 vbox2.pack_start(self.asicVal_combo,False,False,0)
 
                 channelVal_label = Gtk.Label("Channel")
@@ -109,6 +112,7 @@ class ChipTestWindow(Gtk.Window):
                 #self.femb_config.selectChannel(asic, channel)
 		data = subprocess.check_output(["python", "select_channel.py",config_type, asic, channel])
 		subw = DataViewWindow(data)
+
 
 
 win = ChipTestWindow()

@@ -6,7 +6,7 @@ from gi.repository import Gdk
 #from femb_config_35t import FEMB_CONFIG
 #from setup_config import *
 #from setup_gui import *
-from adc_setup_gui import config
+from adc_setup_gui import *
 from femb_rootdata import FEMB_ROOTDATA
 from femb_udp_cmdline import FEMB_UDP
 import subprocess
@@ -14,9 +14,9 @@ import time
 
 class OutputWindow(Gtk.Window):
 
-        def __init__(self, data1):
+        def __init__(self, data):
                 Gtk.Window.__init__(self, title="View Output")
-                self.data1 = data1
+                self.data = data
                 self.grid = Gtk.Grid()
                 self.add(self.grid)
                 self.create_textview()
@@ -32,7 +32,8 @@ class OutputWindow(Gtk.Window):
 
                 self.textview = Gtk.TextView()
                 self.textbuffer = self.textview.get_buffer()
-                self.textbuffer.set_text(self.data1)
+                self.textbuffer.set_text(self.data)
+		self.textbuffer.unpdate_idletasks()
                 scrolledwindow.add(self.textview)
                 Gtk.main_quit()
 """
@@ -78,13 +79,13 @@ class AnotherWindow(Gtk.Window):
                 dotest_button.connect("clicked", self.call_dotest)
                 vbox2.pack_start(dotest_button, True, True, 0)
 
-                button = Gtk.CheckButton("Plot Waveform")
-                button.connect("toggled", self.call_plot, "Plot Waveform")
-                vbox2.pack_start(button, True, True, 2)
+                #button = Gtk.CheckButton("Plot Waveform")
+                #button.connect("toggled", self.call_plot, "Plot Waveform")
+                #vbox2.pack_start(button, True, True, 2)
 
-                button = Gtk.CheckButton("Plot FFT")
-                button.connect("toggled", self.call_plot)
-                vbox2.pack_start(button, True, True, 2)
+                #button = Gtk.CheckButton("Plot FFT")
+                #button.connect("toggled", self.call_plot)
+                #vbox2.pack_start(button, True, True, 2)
 
                 hbox.pack_start(vbox2, True, True, 0)
                 
@@ -94,29 +95,30 @@ class AnotherWindow(Gtk.Window):
 
                 self.show_all()
 
-        def call_plot(self, button, name):
-		if button.get_active():
-			state = "on"
-			if name == "Plot Waveform":
-				data = subprocess.check_output(["python", "pyroot_plot.py"])
-                		subw = DataViewWindow(data)
-			elif name == "Plot FFT":
-				data = subprocess.check_output(["python", "plot_fft.py"])
-                		subw = DataViewWindow(data)
+        #def call_plot(self, button, name):
+	#	if button.get_active():
+	#		state = "on"
+	#		if name == "Plot Waveform":
+	#			data = subprocess.check_output(["python", "pyroot_plot.py"])
+        #        		subw = DataViewWindow(data)
+	#		elif name == "Plot FFT":
+	#			data = subprocess.check_output(["python", "plot_fft.py"])
+        #        		subw = DataViewWindow(data)
 
-		else:
-			state = "off"
+	#	else:
+	#		state = "off"
 
 
                 #data = subprocess.check_output(["python", "pyroot_plot.py"])
                 #subw = DataViewWindow(data)
 
-        def call_plot_fft(self, button):
-                data = subprocess.check_output(["python", "plot_fft.py"])
-                subw = DataViewWindow(data)
+        #def call_plot_fft(self, button):
+        #        data = subprocess.check_output(["python", "plot_fft.py"])
+        #        subw = DataViewWindow(data)
 
 	def call_dotest(self, button):
-		data = subprocess.check_output(['python','doAdcTest_extPulser_DCscan.py'])
+		data = subprocess.check_call(['python','doAdcTest_extPulser_DCscan.py', config_type])
+		print "Doing something..."
 		subw = DataViewWindow(data)
 
 class ChipTestWindow(Gtk.Window):
@@ -191,6 +193,7 @@ class ChipTestWindow(Gtk.Window):
     
 
 win = ChipTestWindow()
+#win.update_idletasks()
 win.connect("delete-event", Gtk.main_quit)
 win.show_all()
 Gtk.main()
