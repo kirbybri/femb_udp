@@ -5,6 +5,7 @@ from gi.repository import Gdk
 import sys
 import subprocess
 import importlib
+import os
 
 class OutputWindow(Gtk.Window):
 
@@ -70,18 +71,23 @@ class ConfigWindow(Gtk.Window):
         
         def call_configboard(self,button):
                 #config_type = str(self.config_combo.get_active_text())
-                global config_type
-		config_type = "adcTest"
-                mod = "femb_config_" + config_type
-                #mod = "femb_config_adcTest"
+                #global config_type
+		#config_type = "adcTest"
+		config_type = os.environ["CONFIG_TYPE"]
 
-                global config
-                config = importlib.import_module(mod)
+		if (config_type != "adcTest"):
+			print "You do not have the right configuration on the board. This function requires the adcTest configuration. You have", config_type, "configuration on the board. Please go back and rethink your configuration choice."
+			quit()
+		if (config_type == "adcTest"):
+			print "You have the correct configuration on the board. Continuing now."
+			mod = "femb_config_" + config_type
+                	global config
+                	config = importlib.import_module(mod)
 
 		Gtk.main_quit()
 
 	def call_init(self,button):
-                data = subprocess.check_output(["python", "init_femb.py", config_type])
+                data = subprocess.check_output(["python", "init_femb.py"])
                 subw = OutputWindow(data)
 
                 #Gtk.main_quit()

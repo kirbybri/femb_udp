@@ -3,11 +3,18 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Gdk
-#import sys
+import sys
+import importlib
+import os
 #import importlib
 #from femb_config_35t import FEMB_CONFIG
 #from setup_config import *
 from setup_gui import *
+
+config_type = os.environ["CONFIG_TYPE"]
+mod = "femb_config_" + config_type
+config = importlib.import_module(mod)
+
 from femb_rootdata import FEMB_ROOTDATA
 from femb_udp_cmdline import FEMB_UDP
 import subprocess
@@ -62,6 +69,9 @@ class ChipTestWindow(Gtk.Window):
                 plot_fft_button.connect("clicked", self.call_plot_fft)
                 vbox5.pack_start(plot_fft_button, True, True, 0)
 
+                run_all_chan_button = Gtk.Button.new_with_label("Test all channels")
+                run_all_chan_button.connect("clicked", self.call_run_all)
+                vbox5.pack_start(run_all_chan_button, True, True, 0)
 
 		hbox.pack_start(vbox5, True, True, 0)
 
@@ -113,6 +123,14 @@ class ChipTestWindow(Gtk.Window):
 		data = subprocess.check_output(["python", "select_channel.py",config_type, asic, channel])
 		subw = DataViewWindow(data)
 
+
+        def call_run_all(self, button):
+                asicval = str(0)
+                for i in range(16):
+                        chanval = str(i)
+                        data = subprocess.check_output(["python", "select_channel.py",config_type, asicval, chanval])
+                        subprocess.check_output(["python", "pyroot_plot.py"])
+                        subw = DataViewWindow(data)
 
 
 win = ChipTestWindow()
