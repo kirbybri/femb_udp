@@ -1,20 +1,30 @@
 import sys
+import glob
+import os
+import ntpath
 from subprocess import call
 
 if len(sys.argv) != 2 :
 	print 'Invalid # of arguments, usage python processData.py <filelist>'
 	sys.exit(0)
+filelist=str(sys.argv[1])
 
-#configure asics
-filename=str(sys.argv[1])
-
-#for num in runs:
-#input_file = open('filelist.txt', 'r')
-input_file = open(filename, 'r')
+#process data
+newlist = "filelist_processData_" + str(ntpath.basename(filelist))
+input_file = open(filelist, 'r')
+output_file = open( newlist, "w")
 for line in input_file:
-    	print str(line[:-1])
+    	#print str(line[:-1])
 	filename = str(line[:-1])
+	#print filename
+	call(["./processNtuple", str(line[:-1]) ])
+	newname = max(glob.iglob('*.root'), key=os.path.getctime)
+	call(["mv",newname,"data/."])
+	newname = "data/" + newname
+	output_file.write(newname + "\n")
 	print filename
-	#word = "monitoringHistogramsRun" + str(num) + "Subrun1.root"
-	#call(["./processNtuple", str(line[:-1]) ])
-	#call(["./processPulserNtuple", str(line[:-1]) ])
+	print newname
+input_file.close()
+output_file.close()
+
+call(["./summaryAnalysis", newlist ])
