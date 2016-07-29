@@ -12,9 +12,13 @@ import struct
 
 femb = FEMB_UDP()
 
+
+l_first = 1
 hist_real = 0
 c = ROOT.TCanvas()
+c.Range(0,0,2000,10000)
 c.SetLogy()
+
 while 1:
 #for i in range(0,10,1):
 	data = femb.get_data()
@@ -44,25 +48,30 @@ while 1:
 	fft.Transform()
 	
 	hist_real = 0
-	#hist_real = ROOT.TH1F()
-	#hist_real.Fill(0)
 	hist_real = ROOT.TH1F("","",500,0,2000)
-	#hist_real.SetDirectory(0)
 	hist_real = ROOT.TH1F.TransformHisto(fft, hist_real, "MAG")
-	#hist_real.GetXaxis().SetRange(-100,100)
-	#h = c.DrawFrame(-100,100)
-	#hist_real.GetBin(200)
-	#hist_real = ROOT.TH1F.TransformHisto(fft, hist_real, "RE")
 	hist_real.SetTitle("FFT of Waveform")
 	hist_real.GetXaxis().SetTitle("Frequency (kHz)")
 	hist_real.GetYaxis().SetTitle("Log Scale")
+	c.Range(0,0,2000,100000)
+	#c.SetLogy()
+	
+	if (l_first==1):
+		#hist_real.GetYaxis().SetRange(0,100000000)
+		#hist_real.SetMinimum(0)
+		#hist_real.SetMaximum(100000)
+		ymax = hist_real.GetMaximum()
+		ymin = hist_real.GetMinimum()
+		ymiddle = (ymax - ymin)*.5
+		ymin = ymin - ymiddle
+		ymax = ymax + ymiddle
+		h = c.DrawFrame(0,ymin,2000,ymax)
+		l_first = 0
+	
+
+
 	hist_real.Draw()
 	c.Update()
 	c.Modified()
 	#time.sleep(1)
 
-	#hist_im = ROOT.TH1D("","",1100,-100,1000)	
-	#hist_im = ROOT.TH1.TransformHisto(fft, hist_im, "IM")
-	#hist_im.SetTitle("Imaginary part of transform")
-	#hist_im.Draw()
-	#time.sleep(.5)

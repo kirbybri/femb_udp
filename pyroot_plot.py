@@ -64,7 +64,7 @@ while 1:
 		h = c.DrawFrame(-1,ymin,505,ymax)
 		h.SetTitle("Live feed Waveform")
 		h.GetXaxis().SetTitle("Time")
-		h.GetYaxis().SetTitle("Waveform")
+		h.GetYaxis().SetTitle("ADC Value")
 		l_first = 0
 
 	l_first += 1
