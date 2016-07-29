@@ -70,8 +70,8 @@ class ChipTestWindow(Gtk.Window):
                 vbox2.pack_start(asicVal_label, True, True, 0)
                 self.asicVal_combo = Gtk.ComboBoxText()
                 self.asicVal_combo.set_entry_text_column(0)
-                #for i in range(8):
-                	#self.asicVal_combo.append_text(str(i))
+                for i in range(8):
+                	self.asicVal_combo.append_text(str(i))
 		self.asicVal_combo.append_text(str(0))
                 vbox2.pack_start(self.asicVal_combo,False,False,0)
 
@@ -109,7 +109,7 @@ class ChipTestWindow(Gtk.Window):
         def call_selectChannel(self, button):
                 asic = str(self.asicVal_combo.get_active_text())
                 channel = str(self.channelVal_combo.get_active_text())
-                #self.femb_config.selectChannel(asic, channel)
+                self.femb_config.selectChannel(asic, channel)
 		data = subprocess.check_output(["python", "select_channel.py",config_type, asic, channel])
 		subw = DataViewWindow(data)
 

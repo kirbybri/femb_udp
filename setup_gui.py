@@ -44,7 +44,7 @@ class ConfigWindow(Gtk.Window):
                 config_label = Gtk.Label("Board Configuration")
                 vbox.pack_start(config_label, True, True, 0)
 
-                boards = ["35t", "adcTest"]
+                boards = ["35t", "adcTest", "sbnd"]
                 self.config_combo = Gtk.ComboBoxText()
                 self.config_combo.set_entry_text_column(0)
                 for board in boards:

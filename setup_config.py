@@ -14,18 +14,23 @@ if config_type == 'adcTest':
 	global config
 	config = importlib.import_module(mod)
 
-	print "Configuration is...", config
+	#print "Configuration is...", config
 	#call(["python","init_femb.py", config_type])
 
 elif config_type == '35t':
 	mod = "femb_config_" + config_type
 	global config
-	#config = importlib.import_module(mod)
+	config = importlib.import_module(mod)
 
-	print "Configuration is...", config
+elif config_type == 'sbnd':
+	mod = "femb_config_" + config_type
+	global config
+	config = importlib.import_module(mod)
+
+	#print "Configuration is...", config
 	#call(["python","init_femb.py", config_type])
 
 ########## Error message #############
-elif config_type != 'adsTest' or '35t':
-	print "You have input a configuration that is unknown. Please enter 'adcTest' or '35t' configuration"
+elif config_type != 'adcTest' or '35t' or 'sbnd':
+	print "You have input a configuration that is unknown. Please enter 'adcTest' '35t' or 'sbnd' configuration"
 
