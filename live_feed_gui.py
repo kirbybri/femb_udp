@@ -82,7 +82,7 @@ class ChipTestWindow(Gtk.Window):
                 self.asicVal_combo.set_entry_text_column(0)
                 for i in range(8):
                 	self.asicVal_combo.append_text(str(i))
-		self.asicVal_combo.append_text(str(0))
+		#self.asicVal_combo.append_text(str(0))
                 vbox2.pack_start(self.asicVal_combo,False,False,0)
 
                 channelVal_label = Gtk.Label("Channel")

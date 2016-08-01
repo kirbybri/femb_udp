@@ -50,7 +50,7 @@ while 1:
 	hist_real = 0
 	hist_real = ROOT.TH1F("","",500,0,2000)
 	hist_real = ROOT.TH1F.TransformHisto(fft, hist_real, "MAG")
-	hist_real.SetTitle("FFT of Waveform")
+	hist_real.SetTitle("FFT of ADC Values")
 	hist_real.GetXaxis().SetTitle("Frequency (kHz)")
 	hist_real.GetYaxis().SetTitle("Log Scale")
 	c.Range(0,0,2000,100000)
