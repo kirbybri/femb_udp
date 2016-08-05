@@ -45,14 +45,14 @@ class OutputWindow(Gtk.Window):
 		#lines = self.textbuffer.get_line_count()
 		
 		#if self.data[0:18] == "This chip is good.":
-		good_match = start.forward_search("This chip is good.",0,end)
+		good_match = start.forward_search("This ASIC is good.",0,end)
 		print good_match
 		if good_match != None:
 			self.textview.override_background_color(Gtk.StateFlags.NORMAL,Gdk.RGBA(0.0,1.0,0.0,1.0))
 
 		#elif self.data[0:17] == "This chip is bad.":
 		#elif text.count("This chip is bad.") == 1:
-		bad_match = start.forward_search("This chip is bad.",0,end)
+		bad_match = start.forward_search("This ASIC is bad.",0,end)
 		if bad_match != None:
 			self.textview.override_background_color(Gtk.StateFlags.NORMAL,Gdk.RGBA(1.0,0.0,0.0,1.0))
                 
@@ -78,7 +78,7 @@ class AnotherWindow(Gtk.Window):
                 vbox2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
 		global j
 		j = 0	
-                for files in os.walk("/slope_hists"):
+                for files in os.walk("slope_hists"):
 			#print len(files[2])
 			for x in files[2]:#range(0,len(files[2]),1)
 				#print x[-9:-5]
@@ -165,6 +165,8 @@ class AnotherWindow(Gtk.Window):
 		#data = subprocess.check_call(['python','doAdcTest_extPulser_DCscan.py'])
 		#data = subprocess.check_output(["python","slope_hist.py",str(1.5)])
 		data1 = subprocess.check_call(['python','pyroot_all.py', str(sn1), str(j)])
+		#if data1 == 0:
+		#	sys.exit()
 		data = subprocess.check_output(["python", "adcTest_plots.py", str(j),str(sn1)])
 		#print sn1
 		#data = "Hello world. \nThis is a good chip."

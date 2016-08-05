@@ -28,6 +28,9 @@ while chan_num < 16:
 
         name = "data_adctest/output_adcTest_extPulser_DCscan_run_" + str(date) + "_subrun_" + str(filenum) + "_chan_num_" + str(chan_num) + "_asic_serial_num_" + serial_num + ".root"
         file = ROOT.TFile(name, "READ")
+	if file.IsZombie():
+		print "There is no data. Please check that the power supply is on."
+		sys.exit()
         t = file.Get("femb_wfdata")
         t.Draw("wf>>hdum")
 	#t.Draw()
@@ -51,11 +54,12 @@ while chan_num < 16:
     answer.SetTitle("ADC test analysis")
     answer.GetXaxis().SetTitle("Voltage")
     answer.GetYaxis().SetTitle("ADC value")
-    answer.Fit("pol1")
+    answer.Fit("pol1","","",100,1020)
     f = answer.GetFunction("pol1")
     slope = f.GetParameter(1)
     ch2 = f.GetChisquare()
     #dof = f.GetNdf()
+    #48 is the number of degrees of freedom
     x = ch2/48
     #slope = float(slope)
     #iprint type(slope)
@@ -107,15 +111,44 @@ time.sleep(2)
 
 peak = h1.GetMean()
 
-if (peak>0.9 and peak<1.7):
-        print "This chip is good."
-        print "Peak is: ", str(peak)
 
-else:
-        for i in range(0,len(slope_list),1):
-                #print "Slope of channel", i, "is: ", points[i]
-                print "This chip is bad."
-                print "Peak is: ", str(peak)
-                print "This is out of range for a good chip. The slopes for each channel are: Channel #: ",str(i), " Slope:", str(slope_list[i])
+good_chi2 = 0
+good_slope = 0
+for i in range(0,16,1):
+
+	if (slope_list[i]>1.2 and slope_list[i]<1.4):
+        	good_slope += 1
+	if (chi_list[i]>1 and chi_list[i]<20):
+		good_chi2 += 1
+		
+	if (good_slope == 16 and good_chi2 == 16):
+		print "This ASIC is good."
+        	print "Peak is: ", str(peak)
+
+	else:
+        	for i in range(0,len(slope_list),1):
+               		#print "Slope of channel", i, "is: ", points[i]
+               		print "This ASIC is bad."
+               		print "Peak is: ", str(peak)
+               		print "This is out of range for a good ASIC. The slopes and chi2 for each channel are:"
+			print " Channel #: ",str(i), " Slope:", str(slope_list[i]), "Chi2:" ,str(chi_list[i])
+
+		#else:
+                	#for i in range(0,len(slope_list),1):
+                       	#print "Slope of channel", i, "is: ", points[i]
+                 #       print "This ASIC is bad."
+                #        	print "Peak is: ", str(peak)
+                #        	print "This is out of range for a good ASIC. The slopes and chi2 for each channel are: Channel #: ",str(i), " Slope:", str(slope_list[i]), "Chi2:" ,str(chi_list[i])
+
+
+
+
+	#else:
+        	#for i in range(0,len(slope_list),1):
+        #        	#print "Slope of channel", i, "is: ", points[i]
+        #        print "This ASIC is bad."
+        #        	print "Peak is: ", str(peak)
+        #        	print "This is out of range for a good ASIC. The slopes and chi2 for each channel are: Channel #: ",str(i), " Slope:", str(slope_list[i]), "Chi2:" ,str(chi_list[i])
+
 
 

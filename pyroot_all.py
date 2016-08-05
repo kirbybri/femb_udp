@@ -38,18 +38,25 @@ while j < 16:
     channelVal = j
     print "Channel value is", channelVal
     femb_config.selectChannel(asicVal,channelVal)
-
+    	
     c = ROOT.TCanvas()
+    
     #h = c.DrawFrame(-1,90,505,150)
     #h.GetXaxis().SetTitle("Channel Number")
     #h.GetYaxis().SetTitle("Waveform")
     #c.Update()
     #c.Modified()
     l_first = 100
+    
 
     #while 1:
         #for i in range(0,10,1):
     data = femb.get_data()
+    #print data
+    if data == []:
+	print "No data is being sent from the board. Check that power is on. Exiting now"
+	sys.exit()
+
     xpoint = []
     ypoint = []
     num = 0
