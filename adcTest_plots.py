@@ -115,23 +115,25 @@ peak = h1.GetMean()
 good_chi2 = 0
 good_slope = 0
 for i in range(0,16,1):
-
+	#print i
 	if (slope_list[i]>1.2 and slope_list[i]<1.4):
         	good_slope += 1
+		#print good_slope
 	if (chi_list[i]>1 and chi_list[i]<20):
 		good_chi2 += 1
+		#print good_chi2
 		
-	if (good_slope == 16 and good_chi2 == 16):
-		print "This ASIC is good."
-        	print "Peak is: ", str(peak)
+if (good_slope == 16 and good_chi2 == 16):
+	print "This ASIC is good."
+        print "Peak is: ", str(peak)
 
-	else:
-        	for i in range(0,len(slope_list),1):
+else:
+        	#for i in range(0,len(slope_list),1):
                		#print "Slope of channel", i, "is: ", points[i]
-               		print "This ASIC is bad."
-               		print "Peak is: ", str(peak)
-               		print "This is out of range for a good ASIC. The slopes and chi2 for each channel are:"
-			print " Channel #: ",str(i), " Slope:", str(slope_list[i]), "Chi2:" ,str(chi_list[i])
+        print "This ASIC is bad."
+        print "Peak is: ", str(peak)
+        print "This is out of range for a good ASIC. The slopes and chi2 for each channel are:"
+	print " Channel #: ",str(i), " Slope:", str(slope_list[i]), "Chi2:" ,str(chi_list[i])
 
 		#else:
                 	#for i in range(0,len(slope_list),1):
